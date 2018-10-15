@@ -22,17 +22,13 @@ public class DetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Bundle bundle = getIntent().getExtras();
-        Product product = bundle.getParcelable("be.pxl.student.domain.Product");
+        int prodructId = bundle.getInt("be.pxl.student.domain.ProductId");
 
         TextView textView = (TextView) findViewById(R.id.textView);
         TextView textView1 = (TextView) findViewById(R.id.textView2);
         TextView textView2 = (TextView) findViewById(R.id.textView4);
 
-        //geeft geen naam mee?
-        textView.setText(product.getName());
-
-        //WERKT NIET
-        //textView1.setText(product.getId());
+        textView.setText("" + prodructId);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

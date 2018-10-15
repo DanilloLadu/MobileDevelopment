@@ -1,8 +1,10 @@
 package be.pxl.student.layout;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,9 +25,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import be.pxl.student.JSONArrayCursor;
 import be.pxl.student.ProductsListAdapter;
@@ -58,13 +67,24 @@ public class MainActivity extends AppCompatActivity {
 
         getProducts(URL);
 
-        RecyclerView listView = (RecyclerView) findViewById(R.id.articlesListView);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.articlesListView);
     }
 
     private Cursor getJSONCursor(String response){
         try {
             JSONArray array = new JSONArray(response);
             return new JSONArrayCursor(array);
+        } catch (JSONException exception)
+        {
+            String ex = exception.getMessage();
+        }
+        return null;
+    }
+
+    private JSONArray getJSONArray(String response){
+        try {
+            JSONArray array = new JSONArray(response);
+            return array;
         } catch (JSONException exception)
         {
             String ex = exception.getMessage();
@@ -94,12 +114,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void navigateToDetails(View view, Product selectedItem){
-        Intent intent = new Intent(view.getContext(), DetailActivity.class);
-        intent.putExtra("be.pxl.student.domain.Product", selectedItem);
-        startActivity(intent);
-    }
-
     public void getProducts(String url){
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -121,10 +135,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getProducts(){
+        Gson gson = new Gson();
+        if (JSONResponse == ""){
+            List<Product> productList = new ArrayList<>();
+
+            Product product1 = new Product();
+            product1.setName("cola");
+            product1.setId(1);
+
+            Product product2 = new Product();
+            product2.setName("cola");
+            product2.setId(2);
+
+            Product product3 = new Product();
+            product3.setName("cola");
+            product3.setId(3);
+
+            productList.add(product1);
+            productList.add(product2);
+            productList.add(product3);
+
+
+            JSONResponse = gson.toJson(productList);
+        }
+        Type listType = new TypeToken<List<Product>>() {}.getType();
+        List<Product> productList = gson.fromJson(JSONResponse, listType);
+
         mProductslist = (RecyclerView) this.findViewById(R.id.articlesListView);
         mCursor = getJSONCursor(JSONResponse);
-        mAdapter = new ProductsListAdapter(this, mCursor);
+        mAdapter = new ProductsListAdapter(this, mCursor, productList);
         mProductslist.setLayoutManager(new LinearLayoutManager(this));
         mProductslist.setAdapter(mAdapter);
     }
+
+
 }
+
