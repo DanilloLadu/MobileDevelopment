@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="be.pxl.student.layout">
-    <uses-permission android:name="android.permission.INTERNET"/>
+    package="be.danillo.mymobileapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -21,10 +24,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
-            android:label="@string/title_activity_detail"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".MainActivity"/>
+            android:name=".vieuw.ProductListActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".vieuw.ProductActivity" />
+        <activity android:name=".vieuw.OptionActivity"></activity>
+        <activity android:name=".vieuw.db.ProductDBActivity"></activity>
+        <activity android:name=".vieuw.db.ProductListDBActivity"></activity>
     </application>
 
 </manifest>
