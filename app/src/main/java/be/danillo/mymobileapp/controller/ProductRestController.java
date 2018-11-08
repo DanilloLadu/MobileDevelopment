@@ -33,50 +33,56 @@ public class ProductRestController {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Loading Data...");
         progressDialog.show();
-        if (productList == null) {
-            productList = new ArrayList<>();
-            callbackGetResponce(context, "product/all", new VolleyCallback() {
-                @Override
-                public void onSuccessResponse(JSONArray result) {
-                    if (result.length() > 0) {
-                        for (int i = 0; i < result.length(); i++) {
-                            List<Ingredient> ingredientList = new ArrayList<>();
-                            try {
+        new Thread(new Runnable() {
+            public void run() {
+                if (productList == null) {
+                    productList = new ArrayList<>();
+                    callbackGetResponce(context, "product/all", new VolleyCallback() {
+                        @Override
+                        public void onSuccessResponse(JSONArray result) {
+                            if (result.length() > 0) {
+                                for (int i = 0; i < result.length(); i++) {
+                                    List<Ingredient> ingredientList = new ArrayList<>();
+                                    try {
 
-                                JSONObject jsonObj = result.getJSONObject(i);
+                                        JSONObject jsonObj = result.getJSONObject(i);
 
-                                JSONArray jsonIngredientObject = jsonObj.getJSONArray("ingredientList");
+                                        JSONArray jsonIngredientObject = jsonObj.getJSONArray("ingredientList");
 
-                                for (int j = 0; j < jsonIngredientObject.length(); j++) {
+                                        for (int j = 0; j < jsonIngredientObject.length(); j++) {
 
-                                    JSONObject in = jsonIngredientObject.getJSONObject(j);
-                                    // Log.i(TAG, in.getInt("id")+"");
-                                    ingredientList.add(new Ingredient(
-                                            in.getInt("id"),
-                                            in.getString("name"),
-                                            in.getDouble("ammount")
-                                    ));
+                                            JSONObject in = jsonIngredientObject.getJSONObject(j);
+                                            // Log.i(TAG, in.getInt("id")+"");
+                                            ingredientList.add(new Ingredient(
+                                                    in.getInt("id"),
+                                                    in.getString("name"),
+                                                    in.getDouble("ammount")
+                                            ));
+                                        }
+
+                                        productList.add(new Product(
+                                                jsonObj.getInt("id"),
+                                                jsonObj.getString("name"),
+                                                ingredientList));
+
+                                    } catch (JSONException e) {
+                                        Log.e(TAG, "Invalid JSON Object.");
+                                    } finally {
+                                        progressDialog.dismiss();
+                                    }
                                 }
-
-                                productList.add(new Product(
-                                        jsonObj.getInt("id"),
-                                        jsonObj.getString("name"),
-                                        ingredientList));
-
-                            } catch (JSONException e) {
-                                Log.e(TAG, "Invalid JSON Object.");
-                            } finally {
+                            } else {
                                 progressDialog.dismiss();
                             }
                         }
-                    } else {
-                        progressDialog.dismiss();
-                    }
+                    });
+                } else {
+                    progressDialog.dismiss();
                 }
-            });
-        } else {
-            progressDialog.dismiss();
-        }
+            }
+        }).start();
+
+
     }
 
     public void callbackGetResponce(Context context, String prefix, final VolleyCallback callback) {
